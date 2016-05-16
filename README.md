@@ -11,3 +11,8 @@ This module is a parser for Stanford course descriptions that extracts course re
     $ python -m stanfordreq -h
     
   More information is available in the module docstrings.
+
+## Testing
+  Test cases can be run with [py.test](http://pytest.org/latest/):
+  
+    $ py.test
