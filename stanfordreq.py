@@ -1,18 +1,9 @@
 """
 Extracts requirements data from Stanford course descriptions.
 
-Script usage:
+Script:
 
   python stanfordreq.py [-h] [explorecourses] [reqs]
-
-  positional arguments:
-    explorecourses  Explorecourses data, one JSON document per class per line
-                  (default stdin)
-    reqs            Requirements output data, one JSON document per class per
-                  line (default stdout)
-
-  optional arguments:
-    -h, --help      show this help message and exit
 
 Functions:
 
@@ -32,13 +23,13 @@ def parse_all(courses, filter_codes=True, add_postreq=True):
     Parses a set of courses for requirements.
 
     Arguments:
-      courses: list of dictionaries for each class, with required fields
+      courses: list of dictionaries for each course, with required fields
                'code' and 'description'
       filter_codes: flag (default True) indicating whether to filter out
                     course requirements that don't exist in the courses array
       add_postreq: flag (default True) indicating whether to add in postreqs
     Output:
-      list of dictionaries for each class with fields 'code', 'description',
+      list of dictionaries for each course with fields 'code', 'description',
       'prereq', 'coreq' 'recommend', and 'postreq' (if add_postreq is True)
     """
     if filter_codes:
@@ -115,7 +106,7 @@ def extract_courses(datastr, department=""):
 
     current_department = department
     last_position = 0
-    # keeps looking for classes until end of string
+    # keeps looking for courses until end of string
     while True:
         # find next department and record its position
         department_group = rdepartment.search(datastr, last_position)
@@ -161,15 +152,15 @@ def extract_courses(datastr, department=""):
 if __name__ in '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('explorecourses', nargs='?', type=argparse.FileType('r'), default='-',
-                        help='Explorecourses data, one JSON document per class per line (default stdin)')
+                        help='Explorecourses data, one JSON document per course per line (default stdin)')
     parser.add_argument('reqs', nargs='?', type=argparse.FileType('w'), default='-',
-                        help='Requirements output data, one JSON document per class per line (default stdout)')
+                        help='Requirements output data, one JSON document per course per line (default stdout)')
     args = parser.parse_args()
 
     courses = []
     for line in args.explorecourses:
         courses.append(json.loads(line))
 
-    prereqs = parse_all(courses)
-    for prereq in prereqs:
-        args.prereqs.write(json.dumps(prereq) + '\n')
+    reqs = parse_all(courses)
+    for req in reqs:
+        args.reqs.write(json.dumps(req) + '\n')
