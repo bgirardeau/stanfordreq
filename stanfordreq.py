@@ -18,6 +18,14 @@ import re
 import sys
 
 
+# Maps non-standard department names to the standard form. Add new entries as needed.
+DEPARTMENT_ALT_NAMES = {
+    'Econ': 'ECON',
+    'Math': 'MATH',
+    'PHYS': 'PHYSICS',
+}
+
+
 def parse_all(courses, filter_codes=True, add_postreq=True):
     """
     Parses a set of courses for requirements.
@@ -97,7 +105,8 @@ def extract_courses(datastr, department=""):
     """
     Extracts all candidate courses in a string.
     """
-    rdepartment = re.compile("([A-Z]+)(?:\s*)(?=\d)")
+    rdepartment = re.compile("([A-Z]+|%s)(?:\s*)(?=\d)" %
+                             '|'.join(DEPARTMENT_ALT_NAMES.keys()))
     rcourse_number = re.compile("(\d\d?\d?)([A-Z])?")
     rlist_separator = re.compile("(?:,?\s*(?:or|and)?\s*)")
     rfollow_on_let = re.compile("(?:/|(?:\s+or\s+))([A-Z])(?=\s|,|$)")
@@ -112,6 +121,7 @@ def extract_courses(datastr, department=""):
         department_group = rdepartment.search(datastr, last_position)
         if department_group is not None and department_group.group(1):
             next_department = department_group.group(1)
+            next_department = DEPARTMENT_ALT_NAMES.get(next_department, next_department)
             dept_position = department_group.end()
         else:
             dept_position = -1
